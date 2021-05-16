@@ -1,0 +1,19 @@
+{
+  "name": "petservice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf dist node_modules; mkdir dist; npm install --production && zip dist/pets.zip -r src -r node_modules"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "lambda-api": "0.10.6"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.764.0"
+  }
+}
