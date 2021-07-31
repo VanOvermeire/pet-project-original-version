@@ -1,7 +1,7 @@
-const { requestBodyValidation, queryStringValidation } = require('./lib/helpers');
+const { bodyValidation, queryParamValidation } = require('./lib/helpers');
 const { callFor } = require('./lib/items');
-const { DbProperties: PetsDbProperties } = require('./lib/pets');
-const { DbProperties: WildAnimalDbProperties } = require('./lib/wildAnimals');
+const { Pet } = require('./lib/pets');
+const { WildAnimal } = require('./lib/wildAnimals');
 
 function routesToMapOfPathsWithAvailableMethods(currentRoutes) {
     const optionRoutes = {};
@@ -11,7 +11,7 @@ function routesToMapOfPathsWithAvailableMethods(currentRoutes) {
     return optionRoutes;
 }
 
-function generateOptions(api) {
+function generateOptionCalls(api) {
     const currentRoutes = api.routes();
     const optionRoutes = routesToMapOfPathsWithAvailableMethods(currentRoutes);
 
@@ -27,18 +27,18 @@ function generateOptions(api) {
 }
 
 function apply(api) {
-    const pets = callFor(PetsDbProperties);
-    const wild = callFor(WildAnimalDbProperties);
+    const pets = callFor(Pet);
+    const wild = callFor(WildAnimal);
 
-    api.use(queryStringValidation);
-    api.use(requestBodyValidation);
+    api.use(queryParamValidation);
+    api.use(bodyValidation);
 
     api.get('/pets/:id/client/:clientId', pets.get);
     api.post('/pets/:id/client/:clientId', pets.post);
     api.get('/wild/:id/type/:type', wild.get);
     api.post('/wild/:id/type/:type', wild.post);
 
-    generateOptions(api);
+    generateOptionCalls(api);
 }
 
 module.exports = { apply };

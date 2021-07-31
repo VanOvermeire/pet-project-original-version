@@ -15,7 +15,7 @@ async function dynamoUpdate(params) {
     return docClient.update(params).promise();
 }
 
-function initItemCounter({ ppCountId, psCountId }) {
+function initCounter({ ppCountId, psCountId }) {
     const dynamoDbParams = {
         TableName: DDB_TABLE,
         Item: {
@@ -26,17 +26,17 @@ function initItemCounter({ ppCountId, psCountId }) {
         ConditionExpression: 'attribute_not_exists(itemCount)',
     };
     return dynamoPut(dynamoDbParams).catch(() => {
-        // counter already exists
+        // error if the counter already exists
     });
 }
 
-async function updateCounter(properties) {
-    await initItemCounter(properties);
+async function updateCounter(animal) {
+    await initCounter(animal);
     const params = {
         TableName: DDB_TABLE,
         Key: {
-            ppId: properties.ppCountId,
-            psId: properties.psCountId,
+            ppId: animal.ppCountId,
+            psId: animal.psCountId,
         },
         UpdateExpression: 'Set itemCount = itemCount + :incr',
         ExpressionAttributeValues: {
@@ -47,12 +47,12 @@ async function updateCounter(properties) {
     return dynamoUpdate(params);
 }
 
-function getCounter(properties) {
+function getCounter(animal) {
     const params = {
         TableName: DDB_TABLE,
         Key: {
-            ppId: properties.ppCountId,
-            psId: properties.psCountId,
+            ppId: animal.ppCountId,
+            psId: animal.psCountId,
         },
     };
     return dynamoGet(params)
@@ -64,12 +64,12 @@ function getCounter(properties) {
         });
 }
 
-function _get(properties) {
+function get(animal) {
     const params = {
         TableName: DDB_TABLE,
         Key: {
-            ppId: properties.ppId,
-            psId: properties.psId,
+            ppId: animal.ppId,
+            psId: animal.psId,
         },
     };
     return dynamoGet(params)
@@ -78,10 +78,10 @@ function _get(properties) {
         });
 }
 
-async function _getWithCounter(properties) {
+async function getWithCounter(animal) {
     return Promise.all([
-        _get(properties),
-        getCounter(properties),
+        get(animal),
+        getCounter(animal),
     ])
         .then(data => {
             if (data[0]) {
@@ -95,13 +95,8 @@ async function _getWithCounter(properties) {
         });
 }
 
-function getItem(properties) {
-    if (properties.getCounter) return _getWithCounter(properties);
-    return _get(properties);
-}
-
-function _put(properties) {
-    const { ppId, psId, item } = properties;
+function put(animal) {
+    const { ppId, psId, item } = animal;
     Object.assign(item, { ppId, psId });
     const dynamoDbParams = {
         TableName: DDB_TABLE,
@@ -110,14 +105,19 @@ function _put(properties) {
     return dynamoPut(dynamoDbParams);
 }
 
-function _putWithCounter(properties) {
-    return _put(properties)
-        .then(() => updateCounter(properties));
+function putWithCounter(animal) {
+    return put(animal)
+        .then(() => updateCounter(animal));
 }
 
-function putItem(properties) {
-    if (properties.updateCounter) return _putWithCounter(properties);
-    return _put(properties);
+function getItem(animal) {
+    if (animal.getCounter) return getWithCounter(animal);
+    return get(animal);
+}
+
+function putItem(animal) {
+    if (animal.updateCounter) return putWithCounter(animal);
+    return put(animal);
 }
 
 module.exports = {

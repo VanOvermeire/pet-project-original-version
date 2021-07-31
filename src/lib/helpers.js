@@ -2,7 +2,7 @@ function validateString(value) {
     if (!value.trim()) throw new Error('Received an empty value');
 }
 
-function bodyValidate(obj) {
+function validateObject(obj) {
     if (typeof obj === 'undefined') return;
     if (typeof obj === 'object') {
         Object.keys(obj).forEach(key => {
@@ -16,21 +16,21 @@ function bodyValidate(obj) {
     }
 }
 
-function requestBodyValidation(request, response, next) {
+function bodyValidation(request, response, next) {
     if (!request.body && request.method !== 'POST') {
         next();
     } else {
         try {
-            bodyValidate(request.body);
+            validateObject(request.body);
             next();
         } catch (e) {
-            console.error(`body: ${e}`);
+            console.error(`body validation error: ${e}`);
             return response.sendStatus(400);
         }
     }
 }
 
-function queryStringValidation(request, response, next) {
+function queryParamValidation(request, response, next) {
     if (!request.query) {
         next();
     } else {
@@ -41,14 +41,13 @@ function queryStringValidation(request, response, next) {
             });
             next();
         } catch (e) {
-            console.log(`query string validation error: ${e}`);
+            console.log(`query parameters validation error: ${e}`);
             return response.sendStatus(400);
         }
     }
 }
 
-
 module.exports = {
-    requestBodyValidation,
-    queryStringValidation,
+    bodyValidation,
+    queryParamValidation,
 };

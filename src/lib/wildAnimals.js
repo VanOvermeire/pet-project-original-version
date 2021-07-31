@@ -1,6 +1,6 @@
 const { WILD_ANIMALS_ID, COUNTER_ID } = require('../config');
 
-class DbProperties {
+class WildAnimal {
     constructor(request) {
         const { id, type } = request.params;
         const { age } = request.body ? request.body : {};
@@ -30,15 +30,8 @@ class DbProperties {
     get psCountId() {
         return this.type;
     }
-
-    clone() {
-        return Object.create(
-            Object.getPrototypeOf(this),
-            Object.getOwnPropertyDescriptors(this),
-        );
-    }
 }
 
 module.exports = {
-    DbProperties,
+    WildAnimal,
 };

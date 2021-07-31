@@ -17,7 +17,8 @@ routes.apply(api);
 
 exports.handler = async (event, context) => {
     console.log(event);
-    if(event.version === "2.0") { // TODO temp - bug in library...
+    // lambda-api library cannot handle newer event versions...
+    if(event.version === "2.0") {
         event.httpMethod = event.requestContext.http.method;
         event.path = event.requestContext.http.path;
     }

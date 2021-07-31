@@ -1,6 +1,6 @@
 const { PETS_ID } = require('../config');
 
-class DbProperties {
+class Pet {
     constructor(request) {
         const { id, clientId } = request.params;
         const { name, age, cuteness, type } = request.body ? request.body : {};
@@ -20,15 +20,8 @@ class DbProperties {
     get psId() {
         return this.id;
     }
-
-    clone() {
-        return Object.create(
-            Object.getPrototypeOf(this),
-            Object.getOwnPropertyDescriptors(this),
-        );
-    }
 }
 
 module.exports = {
-    DbProperties,
+    Pet,
 };
